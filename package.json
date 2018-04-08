@@ -5,6 +5,7 @@
   "private": false,
   "main": "index.js",
   "dependencies": {
+    "chain": "https://github.com/jeffallen6767/chain.git",
     "chartist": "^0.10.1",
     "classnames": "^2.2.5",
     "material-ui": "1.0.0-beta.34",
@@ -27,13 +28,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/creativetimofficial/material-dashboard-react.git"
+    "url": "git+https://github.com/jeffallen6767/WebClientForChain.git"
   },
   "keywords": [],
   "author": "Jeff Allen",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/creativetimofficial/material-dashboard-react/issues"
-  },
-  "homepage": "https://creativetimofficial.github.io/material-dashboard-react/#/dashboard"
+    "url": "https://github.com/jeffallen6767/WebClientForChain/issues"
+  }
 }
