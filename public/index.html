@@ -41,7 +41,16 @@
         <noscript>
           You need to enable JavaScript to run this app.
         </noscript>
-        
+        <script>
+        // globals - TODO: make this part of the scope via-build/deploy
+        var
+          CashMoneyConfig = {
+            "api": {
+              "host": "http://localhost",
+              "port": 6767
+            }
+          };
+        </script>
         <div id="root"></div>
 
     </body>
