@@ -38,7 +38,8 @@ class App extends React.Component {
   state = {
     accounts: [],
     account: {
-      name: ''
+      name: '',
+      //name: 'test',
     },
     mobileOpen: false
   };
@@ -74,13 +75,19 @@ class App extends React.Component {
       const ps = new PerfectScrollbar(this.refs.mainPanel);
     }
     api.get.accounts((err, data) => {
-      console.log("callback", [].slice.call(arguments));
+      //console.log("callback", [].slice.call(arguments));
       if (err) {
         console.error("App.jsx, componentDidMount, api.get.accounts, error:", err);
         return;
       } else {
-        console.log("App.jsx, componentDidMount, api.get.accounts, success:", data, data.accounts);
-        this.setState({ accounts: data.accounts });
+        if (data.error) {
+          console.error("App.jsx, componentDidMount, api.get.accounts, error:", data.error, data);
+        } else if (!Array.isArray(data.accounts)) {
+          console.error("App.jsx, componentDidMount, api.get.accounts, error: data.accounts not array", data);
+        } else {
+          //console.log("App.jsx, componentDidMount, api.get.accounts, success:", data, data.accounts);
+          this.setState({ accounts: data.accounts });
+        }
       }
     });
   }
@@ -89,6 +96,11 @@ class App extends React.Component {
   }
   render() {
     const { classes, ...rest } = this.props;
+    
+    const alignItems = 'center';
+    const direction = 'row';
+    const justify = 'center';
+    
     return this.state.account.name !== '' ? (
       <div className={classes.wrapper}>
         <Sidebar
@@ -120,21 +132,31 @@ class App extends React.Component {
       </div>
     ) : (
       <div className={classes.wrapper} ref="mainPanel">
-        <Grid container>
-          
-          <ItemGrid xs={12} sm={12} md={6}>
-            <RegularCard
-              headerColor="blue"
-              cardTitle="Chain Accounts"
-              cardSubtitle="Please choose an account."
-              content={
-                <Table
-                  tableHeaderColor="info"
-                  tableHead={this.getAccountKeys()}
-                  tableData={this.getAccountData()}
+        <Grid container className={classes.root}>
+          <ItemGrid xs={12} sm={1} md={12}>
+            <Grid
+              container
+              spacing={16}
+              className={classes.demo}
+              alignItems={alignItems}
+              direction={direction}
+              justify={justify}
+            >
+              <Grid key="accounts" item className={classes.accounts}>
+                <RegularCard
+                  headerColor="blue"
+                  cardTitle="Chain Accounts"
+                  cardSubtitle="Please choose an account."
+                  content={
+                    <Table
+                      tableHeaderColor="info"
+                      tableHead={this.getAccountKeys()}
+                      tableData={this.getAccountData()}
+                    />
+                  }
                 />
-              }
-            />
+              </Grid>
+            </Grid>
           </ItemGrid>
         </Grid>
       </div>

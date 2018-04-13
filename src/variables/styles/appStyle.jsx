@@ -5,6 +5,15 @@
 import { drawerWidth, transition, container } from "variables/styles.jsx";
 
 const appStyle = theme => ({
+  root: {
+    flexGrow: 1,
+  },
+  demo: {
+    /*width: 240,*/
+  },
+  accounts: {
+    margin: "auto",
+  },
   wrapper: {
     position: "relative",
     top: "0",

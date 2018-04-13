@@ -45,7 +45,7 @@ function callCashMoneyApi(path, callback, options) {
       ), 
       options || {}
     );
-    console.log("allOptions", allOptions);
+    //console.log("allOptions", allOptions);
   return fetch(
     getUrl(path),
     allOptions
