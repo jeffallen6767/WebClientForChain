@@ -12,7 +12,8 @@ import {
   Sidebar,
   ItemGrid,
   RegularCard,
-  Table
+  Table,
+  UnlockModal
 } from "components";
 
 import appRoutes from "routes/app.jsx";
@@ -35,14 +36,26 @@ const switchRoutes = (
 );
 
 class App extends React.Component {
+  
+  constructor () {
+    super();
+    this.handleOpenModal = this.handleOpenModal.bind(this);
+    this.handleCloseModal = this.handleCloseModal.bind(this);
+  }
+  
+  defaultAccount = {
+    name: '',
+    //name: 'test',
+  };
+  
   state = {
     accounts: [],
-    account: {
-      name: '',
-      //name: 'test',
-    },
-    mobileOpen: false
+    account: this.defaultAccount,
+    mobileOpen: false,
+    showModal: false,
+    modalData: {}
   };
+  
   getAccountKeys = () => {
     return [
       "ID", 
@@ -74,7 +87,7 @@ class App extends React.Component {
       // eslint-disable-next-line
       const ps = new PerfectScrollbar(this.refs.mainPanel);
     }
-    api.get.accounts((err, data) => {
+    api.getAccounts((err, data) => {
       //console.log("callback", [].slice.call(arguments));
       if (err) {
         console.error("App.jsx, componentDidMount, api.get.accounts, error:", err);
@@ -91,9 +104,25 @@ class App extends React.Component {
       }
     });
   }
+  
   componentDidUpdate() {
     this.refs.mainPanel.scrollTop = 0;
   }
+
+  handleOpenModal = (event, key, prop) => {
+    console.log("+ handleOpenModal", key, prop, event);
+    this.setState({ showModal: true, modalData: this.state.accounts[key] });
+  }
+  
+  handleCloseModal = (event, unlockedAccount) => {
+    console.log("- handleCloseModal", unlockedAccount, event);
+    this.setState({ showModal: false, account: unlockedAccount || this.defaultAccount});
+  }
+  
+  /*
+  <p>Modal text!</p>
+          <button onClick={this.handleCloseModal}>Close Modal</button>
+  */
   render() {
     const { classes, ...rest } = this.props;
     
@@ -132,6 +161,16 @@ class App extends React.Component {
       </div>
     ) : (
       <div className={classes.wrapper} ref="mainPanel">
+        <UnlockModal 
+           isOpen={this.state.showModal}
+           closeModal={this.handleCloseModal}
+           modalData={this.state.modalData}
+           contentLabel="onRequestClose Example"
+           onRequestClose={this.handleCloseModal}
+           shouldCloseOnOverlayClick={false}
+        >
+          
+        </UnlockModal>
         <Grid container className={classes.root}>
           <ItemGrid xs={12} sm={1} md={12}>
             <Grid
@@ -152,6 +191,7 @@ class App extends React.Component {
                       tableHeaderColor="info"
                       tableHead={this.getAccountKeys()}
                       tableData={this.getAccountData()}
+                      onClick={this.handleOpenModal}
                     />
                   }
                 />

@@ -32,9 +32,20 @@ function getUrl(path) {
   return host + ":" + port + path;
 }
 
+function getPostOptions(data) {
+  return {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'content-type': 'application/json'
+    }
+  };
+}
+
 function callCashMoneyApi(path, callback, options) {
   var 
     defaultOptions = {
+      redirect: 'follow',
       credentials: 'omit', // include, same-origin, *omit
       mode: 'cors', // no-cors, cors, *same-origin
     },
@@ -45,7 +56,7 @@ function callCashMoneyApi(path, callback, options) {
       ), 
       options || {}
     );
-    //console.log("allOptions", allOptions);
+    console.log("allOptions", allOptions);
   return fetch(
     getUrl(path),
     allOptions
@@ -66,13 +77,11 @@ function callCashMoneyApi(path, callback, options) {
 }
 
 export const api = {
-  "get": {
-    "accounts": function(callback) {
-      return callCashMoneyApi("/loadAccounts", callback);
-    }
+  "getAccounts": function(callback) {
+    return callCashMoneyApi("/loadAccounts", callback);
   },
-  "post": {
-    
+  "unlockAccount": function(account, callback) {
+    return callCashMoneyApi("/unlockAccount", callback, getPostOptions(account));
   }
 };
 

@@ -13,7 +13,7 @@ import PropTypes from "prop-types";
 import tableStyle from "variables/styles/tableStyle";
 
 function CustomTable({ ...props }) {
-  const { classes, tableHead, tableData, tableHeaderColor } = props;
+  const { classes, tableHead, tableData, tableHeaderColor, onClick } = props;
   return (
     <div className={classes.tableResponsive}>
       <Table className={classes.table}>
@@ -36,7 +36,7 @@ function CustomTable({ ...props }) {
         <TableBody>
           {tableData.map((prop, key) => {
             return (
-              <TableRow key={key}>
+              <TableRow key={key} onClick={event => onClick(event, key, prop)}>
                 {prop.map((prop, key) => {
                   return (
                     <TableCell className={classes.tableCell} key={key}>

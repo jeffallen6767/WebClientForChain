@@ -41,6 +41,12 @@ import Header from "./Header/Header.jsx";
 import HeaderLinks from "./Header/HeaderLinks.jsx";
 
 // ##############################
+// // // Modal
+// #############################
+
+import UnlockModal from "./Modal/UnlockModal.jsx";
+
+// ##############################
 // // // Sidebar
 // #############################
 
@@ -99,6 +105,8 @@ export {
   // Header
   Header,
   HeaderLinks,
+  // Modal
+  UnlockModal,
   // Sidebar
   Sidebar,
   //Snackbar
