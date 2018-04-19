@@ -44,8 +44,7 @@ class App extends React.Component {
   }
   
   defaultAccount = {
-    name: '',
-    //name: 'test',
+    name: ''
   };
   
   state = {
@@ -72,7 +71,7 @@ class App extends React.Component {
         account.name, 
         "$ " + (account.balance || 0).toFixed(2) + "", 
         typeof account.keys.privateKey === "string" ? "Unlocked" : "Locked",
-        account.keys.public
+        account.keys.publicKey
       ];
     });
   };
@@ -111,7 +110,11 @@ class App extends React.Component {
 
   handleOpenModal = (event, key, prop) => {
     console.log("+ handleOpenModal", key, prop, event);
-    this.setState({ showModal: true, modalData: this.state.accounts[key] });
+    if (prop[3] === "Unlocked") {
+      this.setState({ account: prop });
+    } else {
+      this.setState({ showModal: true, modalData: this.state.accounts[key] });
+    }
   }
   
   handleCloseModal = (event, unlockedAccount) => {
@@ -165,7 +168,7 @@ class App extends React.Component {
            isOpen={this.state.showModal}
            closeModal={this.handleCloseModal}
            modalData={this.state.modalData}
-           contentLabel="onRequestClose Example"
+           contentLabel="Unlock an account..."
            onRequestClose={this.handleCloseModal}
            shouldCloseOnOverlayClick={false}
         >

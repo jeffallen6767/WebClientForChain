@@ -18,18 +18,18 @@ import {
 
 const appRoutes = [
   {
-    path: "/user",
-    sidebarName: "User Profile",
-    navbarName: "Profile",
-    icon: Person,
-    component: UserProfile
-  },
-  {
     path: "/dashboard",
     sidebarName: "Dashboard",
     navbarName: "Material Dashboard",
     icon: Dashboard,
     component: DashboardPage
+  },
+  {
+    path: "/user",
+    sidebarName: "User Profile",
+    navbarName: "Profile",
+    icon: Person,
+    component: UserProfile
   },
   {
     path: "/table",
@@ -66,7 +66,7 @@ const appRoutes = [
     icon: Notifications,
     component: NotificationsPage
   },
-  { redirect: true, path: "/", to: "/user", navbarName: "Redirect" }
+  { redirect: true, path: "/", to: "/dashboard", navbarName: "Redirect" }
 ];
 
 export default appRoutes;
