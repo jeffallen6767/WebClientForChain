@@ -4,7 +4,7 @@ import { Switch, Route, Redirect } from "react-router-dom";
 // creates a beautiful scrollbar
 import PerfectScrollbar from "perfect-scrollbar";
 import "perfect-scrollbar/css/perfect-scrollbar.css";
-import { withStyles, Grid } from "material-ui";
+import { withStyles, Grid, Button } from "material-ui";
 
 import { 
   Header, 
@@ -13,7 +13,9 @@ import {
   ItemGrid,
   RegularCard,
   Table,
-  UnlockModal
+  UnlockModal,
+  CreateModal,
+  IconButton
 } from "components";
 
 import appRoutes from "routes/app.jsx";
@@ -24,6 +26,8 @@ import image from "assets/img/sidebar-2.jpg";
 import logo from "assets/img/cash-money-inverted.png";
 
 import { api } from "api";
+
+import { Fingerprint } from "material-ui-icons";
 
 const switchRoutes = (
   <Switch>
@@ -39,20 +43,25 @@ class App extends React.Component {
   
   constructor () {
     super();
-    this.handleOpenModal = this.handleOpenModal.bind(this);
-    this.handleCloseModal = this.handleCloseModal.bind(this);
+    this.handleOpenUnlockModal = this.handleOpenUnlockModal.bind(this);
+    this.handleCloseUnlockModal = this.handleCloseUnlockModal.bind(this);
+    this.handleOpenCreateModal = this.handleOpenCreateModal.bind(this);
+    this.handleCloseCreateModal = this.handleCloseCreateModal.bind(this);
   }
   
   defaultAccount = {
-    name: ''
+    name: '',
+    //name: 'test'
   };
   
   state = {
     accounts: [],
     account: this.defaultAccount,
     mobileOpen: false,
-    showModal: false,
-    modalData: {}
+    showUnlockModal: false,
+    unlockModalData: {},
+    showCreateModal: false,
+    createModalData: {}
   };
   
   getAccountKeys = () => {
@@ -86,6 +95,10 @@ class App extends React.Component {
       // eslint-disable-next-line
       const ps = new PerfectScrollbar(this.refs.mainPanel);
     }
+    this.doGetAccounts();
+  }
+  
+  doGetAccounts() {
     api.getAccounts((err, data) => {
       //console.log("callback", [].slice.call(arguments));
       if (err) {
@@ -108,30 +121,57 @@ class App extends React.Component {
     this.refs.mainPanel.scrollTop = 0;
   }
 
-  handleOpenModal = (event, key, prop) => {
-    console.log("+ handleOpenModal", key, prop, event);
+  handleOpenUnlockModal = (event, key, prop) => {
+    console.log("+ handleOpenUnlockModal", key, prop, event);
     if (prop[3] === "Unlocked") {
       this.setState({ account: prop });
     } else {
-      this.setState({ showModal: true, modalData: this.state.accounts[key] });
+      this.setState({ showUnlockModal: true, unlockModalData: this.state.accounts[key] });
     }
   }
   
-  handleCloseModal = (event, unlockedAccount) => {
-    console.log("- handleCloseModal", unlockedAccount, event);
-    this.setState({ showModal: false, account: unlockedAccount || this.defaultAccount});
+  handleCloseUnlockModal = (event, unlockedAccount) => {
+    console.log("- handleCloseUnlockModal", unlockedAccount, event);
+    this.setState({ showUnlockModal: false, account: unlockedAccount || this.defaultAccount});
   }
   
-  /*
-  <p>Modal text!</p>
-          <button onClick={this.handleCloseModal}>Close Modal</button>
-  */
+  handleOpenCreateModal = (event, key, prop) => {
+    console.log("+ handleOpenCreateModal", key, prop, event);
+    this.setState({ showCreateModal: true, createModalData: {"name":"","pass":""} });
+  }
+  
+  handleCloseCreateModal = (event, createdAccount) => {
+    console.log("- handleCloseCreateModal", createdAccount, event);
+    this.setState({ showCreateModal: false });
+    this.doGetAccounts();
+  }
+  
   render() {
     const { classes, ...rest } = this.props;
     
     const alignItems = 'center';
     const direction = 'row';
     const justify = 'center';
+    
+    const accountData = this.getAccountData();
+    
+    const cardSubTitle = accountData.length ? "Please choose an account." : "Please Create an account.";
+
+    const createButton = (
+      <Button onClick={this.handleOpenCreateModal} className={classes.button} variant="raised" color="default">
+        Create Account
+        <Fingerprint className={classes.rightIcon} />
+      </Button>
+    );
+    
+    const accountList = accountData.length ? (
+      <Table
+        tableHeaderColor="info"
+        tableHead={this.getAccountKeys()}
+        tableData={accountData}
+        onClick={this.handleOpenUnlockModal}
+      />
+    ) : ('');
     
     return this.state.account.name !== '' ? (
       <div className={classes.wrapper}>
@@ -165,17 +205,25 @@ class App extends React.Component {
     ) : (
       <div className={classes.wrapper} ref="mainPanel">
         <UnlockModal 
-           isOpen={this.state.showModal}
-           closeModal={this.handleCloseModal}
-           modalData={this.state.modalData}
+           isOpen={this.state.showUnlockModal}
+           closeModal={this.handleCloseUnlockModal}
+           modalData={this.state.unlockModalData}
            contentLabel="Unlock an account..."
-           onRequestClose={this.handleCloseModal}
+           onRequestClose={this.handleCloseUnlockModal}
            shouldCloseOnOverlayClick={false}
         >
-          
         </UnlockModal>
+        <CreateModal 
+           isOpen={this.state.showCreateModal}
+           closeModal={this.handleCloseCreateModal}
+           modalData={this.state.createModalData}
+           contentLabel="Create an account..."
+           onRequestClose={this.handleCloseCreateModal}
+           shouldCloseOnOverlayClick={false}
+        >
+        </CreateModal>
         <Grid container className={classes.root}>
-          <ItemGrid xs={12} sm={1} md={12}>
+          <ItemGrid xs={12} sm={12} md={12}>
             <Grid
               container
               spacing={16}
@@ -188,14 +236,12 @@ class App extends React.Component {
                 <RegularCard
                   headerColor="blue"
                   cardTitle="Chain Accounts"
-                  cardSubtitle="Please choose an account."
+                  cardSubtitle={cardSubTitle}
                   content={
-                    <Table
-                      tableHeaderColor="info"
-                      tableHead={this.getAccountKeys()}
-                      tableData={this.getAccountData()}
-                      onClick={this.handleOpenModal}
-                    />
+                    <div>
+                      {accountList}
+                      {createButton}
+                    </div>
                   }
                 />
               </Grid>

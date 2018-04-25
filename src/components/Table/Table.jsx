@@ -13,7 +13,8 @@ import PropTypes from "prop-types";
 import tableStyle from "variables/styles/tableStyle";
 
 function CustomTable({ ...props }) {
-  const { classes, tableHead, tableData, tableHeaderColor, onClick } = props;
+  const { classes, tableHead, tableData, tableHeaderColor } = props;
+  const onClick = typeof props.onClick === 'function' ? props.onClick : function(){/*noop*/};
   return (
     <div className={classes.tableResponsive}>
       <Table className={classes.table}>
