@@ -80,6 +80,9 @@ export const api = {
   "getAccounts": function(callback) {
     return callCashMoneyApi("/loadAccounts", callback);
   },
+  "lockAccount": function(account, callback) {
+    return callCashMoneyApi("/lockAccount", callback, getPostOptions(account));
+  },
   "unlockAccount": function(account, callback) {
     return callCashMoneyApi("/unlockAccount", callback, getPostOptions(account));
   },

@@ -75,10 +75,10 @@ class UnlockModal extends React.Component {
         console.error("UnlockModal.jsx, api.unlockAccount, error:", err);
         return;
       } else {
-        if (data.keys && data.keys.privateKey) {
+        if (data.account.keys && data.account.keys.privateKey) {
           console.log("UnlockModal.jsx, api.unlockAccount, success:");
-          console.log(data);
-          onSuccess(event, data);
+          console.log(data.account);
+          onSuccess(event, data.account);
         } else {
           this.setState({
             "warning": "Invalid passphrase!"

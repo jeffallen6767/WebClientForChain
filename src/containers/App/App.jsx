@@ -29,12 +29,22 @@ import { api } from "api";
 
 import { Fingerprint } from "material-ui-icons";
 
-const switchRoutes = (
+const switchRoutes = (allEverything) => (
   <Switch>
     {appRoutes.map((prop, key) => {
-      if (prop.redirect)
+      console.log("switchRoutes", prop, key);
+      if (prop.redirect) {
         return <Redirect from={prop.path} to={prop.to} key={key} />;
-      return <Route path={prop.path} component={prop.component} key={key} api={api} />;
+      } else {
+        // wrapping/composing
+        const WrappedRoute = ({ component: Component, ...rest }) => (
+          <Route {...rest} render={props => (
+            <Component {...props} api={api} all={allEverything} />
+          )}/>
+        );
+        return <WrappedRoute path={prop.path} component={prop.component} key={key} />
+      }
+      
     })}
   </Switch>
 );
@@ -47,6 +57,7 @@ class App extends React.Component {
     this.handleCloseUnlockModal = this.handleCloseUnlockModal.bind(this);
     this.handleOpenCreateModal = this.handleOpenCreateModal.bind(this);
     this.handleCloseCreateModal = this.handleCloseCreateModal.bind(this);
+    this.updateAppState = this.updateAppState.bind(this);
   }
   
   defaultAccount = {
@@ -124,7 +135,7 @@ class App extends React.Component {
   handleOpenUnlockModal = (event, key, prop) => {
     console.log("+ handleOpenUnlockModal", key, prop, event);
     if (prop[3] === "Unlocked") {
-      this.setState({ account: prop });
+      this.setState({ account: this.state.accounts[prop[0]-0] });
     } else {
       this.setState({ showUnlockModal: true, unlockModalData: this.state.accounts[key] });
     }
@@ -144,6 +155,11 @@ class App extends React.Component {
     console.log("- handleCloseCreateModal", createdAccount, event);
     this.setState({ showCreateModal: false });
     this.doGetAccounts();
+  }
+  
+  updateAppState = (newState) => {
+    console.log("+++ updateAppState", newState);
+    this.setState(newState);
   }
   
   render() {
@@ -173,6 +189,9 @@ class App extends React.Component {
       />
     ) : ('');
     
+    const allEverything = { appState:this.state, updateAppState:this.updateAppState, ...rest };
+    console.log("allEverything", allEverything);
+    
     return this.state.account.name !== '' ? (
       <div className={classes.wrapper}>
         <Sidebar
@@ -183,23 +202,24 @@ class App extends React.Component {
           handleDrawerToggle={this.handleDrawerToggle}
           open={this.state.mobileOpen}
           color="blue"
-          {...rest}
+          {...allEverything}
         />
         <div className={classes.mainPanel} ref="mainPanel">
           <Header
             routes={appRoutes}
             handleDrawerToggle={this.handleDrawerToggle}
-            {...rest}
+            {...allEverything}
           />
+          
           {/* On the /maps route we want the map to be on full screen - this is not possible if the content and conatiner classes are present because they have some paddings which would make the map smaller */}
           {this.getRoute() ? (
             <div className={classes.content}>
-              <div className={classes.container}>{switchRoutes}</div>
+              <div className={classes.container}>{switchRoutes(allEverything)}</div>
             </div>
           ) : (
-            <div className={classes.map}>{switchRoutes}</div>
+            <div className={classes.map}>{switchRoutes(allEverything)}</div>
           )}
-          {this.getRoute() ? <Footer /> : null}
+          {this.getRoute() ? <Footer {...rest} /> : null}
         </div>
       </div>
     ) : (

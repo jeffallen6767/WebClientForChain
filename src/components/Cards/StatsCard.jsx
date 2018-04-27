@@ -56,9 +56,15 @@ function StatsCard({ ...props }) {
             }
           />{" "}
           {statLink !== undefined ? (
-            <a href={statLink.href} className={classes.cardStatsLink}>
-              {statLink.text}
-            </a>
+            statLink.href !== undefined ? (
+              <a href={statLink.href} className={classes.cardStatsLink}>
+                {statLink.text}
+              </a>
+            ) : (
+              <span className={classes.cardStatsLink} onClick={statLink.func}>
+                {statLink.text}
+              </span>
+            )
           ) : statText !== undefined ? (
             statText
           ) : null}

@@ -3,6 +3,9 @@ import PropTypes from "prop-types";
 // react plugin for creating charts
 import ChartistGraph from "react-chartist";
 import {
+  Fingerprint,
+  LockOpen,
+  Lock,
   ContentCopy,
   Store,
   InfoOutline,
@@ -14,6 +17,7 @@ import {
   AccessTime,
   Accessibility
 } from "material-ui-icons";
+
 import { withStyles, Grid } from "material-ui";
 
 import {
@@ -33,10 +37,29 @@ import {
 
 import dashboardStyle from "variables/styles/dashboardStyle";
 
+function fit(chars, max, fill="...") {
+  const 
+    cLen = chars.length,
+    fLen = fill.length,
+    mLen = Math.min(cLen-fLen, max-fLen),
+    odd = mLen % 2,
+    half = (odd ? mLen - 1 : mLen) / 2,
+    first = chars.slice(0, odd ? half + 1 : half),
+    last = chars.slice((-1)*half);
+  return first + fill + last;
+}
+
 class Dashboard extends React.Component {
+  constructor () {
+    super();
+    //console.log("Dashboard.constructor", [].slice.call(arguments));
+    this.lock = this.lock.bind(this);
+  }
+  
   state = {
     value: 0
   };
+  
   handleChange = (event, value) => {
     this.setState({ value });
   };
@@ -44,20 +67,66 @@ class Dashboard extends React.Component {
   handleChangeIndex = index => {
     this.setState({ value: index });
   };
+  
+  lock = (event, all, api, account) => {
+    console.log("+ lock", account, api, event);
+    api.lockAccount(account, (err, data) => {
+      console.log("api.lockAccount callback", err, data);
+      if (err) {
+        console.error("api.lockAccount, error:", err);
+        return;
+      } else {
+        if (data.account.keys && data.account.keys.locked) {
+          console.log("api.lockAccount, success:");
+          console.log(data.account);
+          all.appState.accounts[data.account.data.index] = data.account;
+          all.updateAppState({
+            account: {name:''},
+            accounts: all.appState.accounts
+          });
+          
+        } else {
+          this.setState({
+            "warning": "Invalid passphrase!"
+          });
+        }
+      }
+    });
+    //this.setState({ showCreateModal: true, createModalData: {"name":"","pass":""} });
+  }
+  
   render() {
+    console.log("Dashboard.render.props", this.props);
+    
+    const { classes, all, api, ...rest } = this.props;
+    console.log("classes", classes);
+    console.log("all", all);
+    console.log("api", api);
+    console.log("rest", rest);
+    
+    const appState = all.appState;
+    console.log("appState", appState);
+    
+    const account = appState.account;
+    console.log("account", account);
+    
+    const lockAccount = (event) => {
+      this.lock(event, all, api, account);
+    };
+    
     return (
       <div>
         <Grid container>
           <ItemGrid xs={12} sm={6} md={3}>
             <StatsCard
-              icon={ContentCopy}
-              iconColor="orange"
-              title="Used Space"
-              description="49/50"
-              small="GB"
-              statIcon={Warning}
+              icon={Fingerprint}
+              iconColor="blue"
+              title={"Identity"}
+              description={account.name}
+              small={fit(account.keys.publicKey, 16)}
+              statIcon={LockOpen}
               statIconColor="danger"
-              statLink={{ text: "Get More Space...", href: "#pablo" }}
+              statLink={{ text: "Click to LOCK...", func: lockAccount }}
             />
           </ItemGrid>
           <ItemGrid xs={12} sm={6} md={3}>
@@ -107,9 +176,9 @@ class Dashboard extends React.Component {
               title="Daily Sales"
               text={
                 <span>
-                  <span className={this.props.classes.successText}>
+                  <span className={classes.successText}>
                     <ArrowUpward
-                      className={this.props.classes.upArrowCardCategory}
+                      className={classes.upArrowCardCategory}
                     />{" "}
                     55%
                   </span>{" "}
